@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_randomcolor/flutter_randomcolor.dart';
+import 'package:hello_world_colors/common/app_settings.dart';
 import 'package:hello_world_colors/screens/settings_screen.dart';
 import 'package:hello_world_colors/utils/color_utils.dart';
 import 'package:hello_world_colors/widgets/filter_drawer.dart';
@@ -20,10 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Luminosity _luminosity = Luminosity.random;
 
-  // final BlobController _blobController = BlobController();
-
-  bool _animateBlob = true;
-
   void _shuffleColors() {
     Options options = Options(
       count: 1,
@@ -31,29 +28,24 @@ class _HomeScreenState extends State<HomeScreen> {
       colorType: _colorTypeSet.toList(),
       luminosity: _luminosity,
     );
-    List<int> rgb = RandomColor.getColor(options);
-    // print(options.colorType);
 
+    List<int> rgb = RandomColor.getColor(options);
     setState(() {
       _color = Color.fromRGBO(rgb[0], rgb[1], rgb[2], 1.0);
     });
-    // _blobController.change();
+
     print('_shuffleColors');
   }
 
   Future<void> _gotoSettings() async {
-    Map<String, dynamic> result = await Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SettingsScreen(
-          animateBlob: _animateBlob,
-        ),
+        builder: (context) => const SettingsScreen(),
       ),
     );
-    setState(() {
-      _animateBlob = result['animateBlob'];
-    });
-    print(_animateBlob);
+    setState(() {});
+    print('_gotoSettings() ${AppSettings().blobSpeed}');
   }
 
   void _onAppBarAction(HomeAppBarOverflowActions action) {
@@ -66,7 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
+    print('build ${AppSettings().blobSpeed}');
+
     Size _mediaSize = MediaQuery.of(context).size;
     final Color contrastColor = ColorUtils.contrastColor(_color);
 
@@ -96,36 +89,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody(Size mediaSize) {
-    print('_buildBody $_animateBlob');
+    print('_buildBody ${AppSettings().blobSpeed.toInt()}');
+
     return Center(
       child: Blob.animatedRandom(
         size: mediaSize.shortestSide,
         edgesCount: 5,
         minGrowth: 4,
-        loop: _animateBlob,
-        duration: const Duration(milliseconds: 1500),
+        loop: true,
+        duration: Duration(milliseconds: AppSettings().blobSpeed.toInt()),
         styles: BlobStyles(color: _color),
-        // controller: _blobController,
       ),
-
-      // child: _animateBlob
-      //     ? Blob.animatedRandom(
-      //         size: mediaSize.shortestSide,
-      //         edgesCount: 5,
-      //         minGrowth: 4,
-      //         // loop: true,
-      //         // duration: const Duration(milliseconds: 1500),
-      //         styles: BlobStyles(color: _color),
-      //         // controller: _blobController,
-      //       )
-      //     : Blob.random(
-      //         size: mediaSize.shortestSide,
-      //         // edgesCount: 5,
-      //         // minGrowth: 4,
-      //         // styles: BlobStyles(color: _color),
-      //         styles: BlobStyles(color: Colors.black),
-      //         // controller: _blobController,
-      //       ),
     );
   }
 }
