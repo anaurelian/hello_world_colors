@@ -16,4 +16,10 @@ class UIStrings {
   static const String settingsAction = 'Settings';
   static const String rateAction = 'Rate app';
   static const String whatAction = 'What is this app?';
+
+
+  static const String settingsScreen = 'Settings';
+  static const String animateBlobSetting = 'Animate blob';
+
+
 }

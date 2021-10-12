@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_randomcolor/flutter_randomcolor.dart';
+import 'package:hello_world_colors/screens/settings_screen.dart';
 import 'package:hello_world_colors/utils/color_utils.dart';
 import 'package:hello_world_colors/widgets/filter_drawer.dart';
 import 'package:blobs/blobs.dart';
@@ -19,7 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Luminosity _luminosity = Luminosity.random;
 
-  final BlobController _blobController = BlobController();
+  // final BlobController _blobController = BlobController();
+
+  bool _animateBlob = true;
 
   void _shuffleColors() {
     Options options = Options(
@@ -34,15 +37,36 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _color = Color.fromRGBO(rgb[0], rgb[1], rgb[2], 1.0);
     });
-    _blobController.change();
+    // _blobController.change();
+    print('_shuffleColors');
+  }
+
+  Future<void> _gotoSettings() async {
+    Map<String, dynamic> result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SettingsScreen(
+          animateBlob: _animateBlob,
+        ),
+      ),
+    );
+    setState(() {
+      _animateBlob = result['animateBlob'];
+    });
+    print(_animateBlob);
   }
 
   void _onAppBarAction(HomeAppBarOverflowActions action) {
-
+    switch (action) {
+      case HomeAppBarOverflowActions.settings:
+        _gotoSettings();
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('build');
     Size _mediaSize = MediaQuery.of(context).size;
     final Color contrastColor = ColorUtils.contrastColor(_color);
 
@@ -59,11 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
           _colorTypeSet = colorTypes;
           _luminosity = luminosity;
           _shuffleColors();
-
-          // setState(() {
-          //   _colorTypeSet = colorTypes;
-          //   _luminosity = luminosity;
-          // });
         },
       ),
       body: _buildBody(_mediaSize),
@@ -77,19 +96,36 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody(Size mediaSize) {
+    print('_buildBody $_animateBlob');
     return Center(
-      child: Blob.random(
+      child: Blob.animatedRandom(
         size: mediaSize.shortestSide,
         edgesCount: 5,
         minGrowth: 4,
-        // loop: true,
-        // duration: const Duration(milliseconds: 1500),
-        styles: BlobStyles(
-          color: _color,
-        ),
-        controller: _blobController,
+        loop: _animateBlob,
+        duration: const Duration(milliseconds: 1500),
+        styles: BlobStyles(color: _color),
+        // controller: _blobController,
       ),
+
+      // child: _animateBlob
+      //     ? Blob.animatedRandom(
+      //         size: mediaSize.shortestSide,
+      //         edgesCount: 5,
+      //         minGrowth: 4,
+      //         // loop: true,
+      //         // duration: const Duration(milliseconds: 1500),
+      //         styles: BlobStyles(color: _color),
+      //         // controller: _blobController,
+      //       )
+      //     : Blob.random(
+      //         size: mediaSize.shortestSide,
+      //         // edgesCount: 5,
+      //         // minGrowth: 4,
+      //         // styles: BlobStyles(color: _color),
+      //         styles: BlobStyles(color: Colors.black),
+      //         // controller: _blobController,
+      //       ),
     );
   }
 }
-

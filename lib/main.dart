@@ -15,8 +15,23 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: UIStrings.appName,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        toggleableActiveColor: Colors.black,
+        colorScheme: const ColorScheme.light(
+          primary: Colors.black87,
+        ),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        toggleableActiveColor: Colors.white,
+        colorScheme: const ColorScheme.dark(
+          primary: Colors.black,
+        ),
+        checkboxTheme: CheckboxThemeData(
+          checkColor: MaterialStateProperty.all<Color>(Colors.black),
+        ),
+      ),
       home: const HomeScreen(),
     );
   }
