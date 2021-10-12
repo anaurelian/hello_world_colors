@@ -6,30 +6,26 @@ import 'package:hello_world_colors/common/ui_strings.dart';
 class FilterDrawer extends StatefulWidget {
   const FilterDrawer({
     Key? key,
-    required this.onColorTypeChanged,
+    required this.colorTypes,
+    required this.luminosity,
+    required this.onFilterChanged,
   }) : super(key: key);
 
+  final Set<ColorType> colorTypes;
+
+  final Luminosity luminosity;
+
   /// Called when the user taps a drawer item.
-  final void Function(List<ColorType> colorTypeList) onColorTypeChanged;
+  final void Function(Set<ColorType> colorTypes, Luminosity luminosity) onFilterChanged;
 
   @override
   _FilterDrawerState createState() => _FilterDrawerState();
 }
 
 class _FilterDrawerState extends State<FilterDrawer> {
-  final Map<ColorType, bool> _colorTypeMap = {
-    ColorType.random: true,
-    ColorType.red: false,
-    ColorType.orange: false,
-    ColorType.yellow: false,
-    ColorType.green: false,
-    ColorType.blue: false,
-    ColorType.purple: false,
-    ColorType.pink: false,
-    ColorType.monochrome: false,
-  };
+  late final Set<ColorType> _colorTypes = widget.colorTypes;
 
-  Luminosity _luminosity = Luminosity.random;
+  late Luminosity _luminosity = widget.luminosity;
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +33,20 @@ class _FilterDrawerState extends State<FilterDrawer> {
       child: ListView(
         children: [
           const ListTile(title: Text(UIStrings.colorTypeFilter), enabled: false),
-          for (ColorType colorType in _colorTypeMap.keys) _buildColorType(colorType),
+          _buildColorType(ColorType.random),
+          _buildColorType(ColorType.red),
+          _buildColorType(ColorType.orange),
+          _buildColorType(ColorType.yellow),
+          _buildColorType(ColorType.green),
+          _buildColorType(ColorType.blue),
+          _buildColorType(ColorType.purple),
+          _buildColorType(ColorType.pink),
+          _buildColorType(ColorType.monochrome),
           const ListTile(title: Text(UIStrings.luminosityFilter), enabled: false),
           _buildLuminosityOption(Luminosity.random),
           _buildLuminosityOption(Luminosity.bright),
           _buildLuminosityOption(Luminosity.light),
           _buildLuminosityOption(Luminosity.dark),
-          // for (Luminosity luminosity in Luminosity.values) _buildLuminosityOption(luminosity),
         ],
       ),
     );
@@ -54,12 +57,19 @@ class _FilterDrawerState extends State<FilterDrawer> {
       title: Text(describeEnum(colorType)),
       controlAffinity: ListTileControlAffinity.leading,
       dense: true,
-      value: _colorTypeMap[colorType],
+      value: _colorTypes.contains(colorType),
       onChanged: (bool? value) {
         setState(() {
-          if (value != null) _colorTypeMap[colorType] = value;
+          if (value != null) {
+            if (value) {
+              _colorTypes.add(colorType);
+            } else {
+              _colorTypes.remove(colorType);
+            }
+            widget.onFilterChanged(_colorTypes, _luminosity);
+          }
         });
-        widget.onColorTypeChanged(_colorTypeMap.entries.where((e) => e.value).map((e) => e.key).toList());
+        // widget.onColorTypeChanged(_colorTypeMap.entries.where((e) => e.value).map((e) => e.key).toList());
       },
     );
   }
@@ -71,7 +81,10 @@ class _FilterDrawerState extends State<FilterDrawer> {
       value: luminosity,
       groupValue: _luminosity,
       onChanged: (Luminosity? value) => setState(() {
-        if (value != null) _luminosity = value;
+        if (value != null) {
+          _luminosity = value;
+          widget.onFilterChanged(_colorTypes, _luminosity);
+        }
       }),
     );
   }

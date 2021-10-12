@@ -12,7 +12,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<ColorType> _colorTypeList = [ColorType.random];
+  Set<ColorType> _colorTypeSet = {ColorType.random};
+
+  Luminosity _luminosity = Luminosity.random;
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +22,22 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: _AppBar(),
       drawer: AppDrawer(),
       endDrawer: FilterDrawer(
-        onColorTypeChanged: (List<ColorType> colorTypeList) {
+        colorTypes: _colorTypeSet,
+        luminosity: _luminosity,
+        onFilterChanged: (Set<ColorType> colorTypes, Luminosity luminosity) {
           setState(() {
-            _colorTypeList = colorTypeList;
+            _colorTypeSet = colorTypes;
+            _luminosity = luminosity;
           });
         },
       ),
-      body: Text(_colorTypeList.toString()),
+      body: Column(
+        children: [
+          Text(_colorTypeSet.toString()),
+          const Divider(),
+          Text(_luminosity.toString()),
+        ],
+      ),
     );
   }
 }
