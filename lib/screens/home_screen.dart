@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_randomcolor/flutter_randomcolor.dart';
-import 'package:hello_world_colors/common/ui_strings.dart';
-import 'package:hello_world_colors/widgets/app_drawer.dart';
+import 'package:hello_world_colors/utils/color_utils.dart';
 import 'package:hello_world_colors/widgets/filter_drawer.dart';
 import 'package:blobs/blobs.dart';
+import 'package:hello_world_colors/widgets/home_app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       luminosity: _luminosity,
     );
     List<int> rgb = RandomColor.getColor(options);
-    print(options.colorType);
+    // print(options.colorType);
 
     setState(() {
       _color = Color.fromRGBO(rgb[0], rgb[1], rgb[2], 1.0);
@@ -37,19 +37,21 @@ class _HomeScreenState extends State<HomeScreen> {
     _blobController.change();
   }
 
+  void _onAppBarAction(HomeAppBarOverflowActions action) {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     Size _mediaSize = MediaQuery.of(context).size;
-    final Color contrastColor =
-        ThemeData.estimateBrightnessForColor(_color) == Brightness.dark ? Colors.white : Colors.black;
-
+    final Color contrastColor = ColorUtils.contrastColor(_color);
 
     return Scaffold(
-      appBar: _AppBar(
-        backgroundColor: _color,
-        foregroundColor: contrastColor,
+      appBar: HomeAppBar(
+        color: _color,
+        onAction: _onAppBarAction,
       ),
-      drawer: AppDrawer(),
+      // drawer: AppDrawer(),
       endDrawer: FilterDrawer(
         colorTypes: _colorTypeSet,
         luminosity: _luminosity,
@@ -91,31 +93,3 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({
-    Key? key,
-    this.backgroundColor,
-    this.foregroundColor,
-  }) : super(key: key);
-
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
-      title: const Text(UIStrings.appName),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.filter_list),
-          onPressed: () => Scaffold.of(context).openEndDrawer(),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}

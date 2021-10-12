@@ -32,6 +32,13 @@ class _FilterDrawerState extends State<FilterDrawer> {
     return Drawer(
       child: ListView(
         children: [
+          // SwitchListTile(
+          //   title: Text('Animated blob'),
+          //   controlAffinity: ListTileControlAffinity.leading,
+          //   dense: true,
+          //   value: true,
+          //   onChanged: (bool value) {},
+          // ),
           const ListTile(title: Text(UIStrings.colorTypeFilter), enabled: false),
           _buildColorType(ColorType.random),
           _buildColorType(ColorType.red),
